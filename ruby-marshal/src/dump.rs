@@ -20,6 +20,7 @@ use crate::VALUE_KIND_SYMBOL;
 use crate::VALUE_KIND_SYMBOL_LINK;
 use crate::VALUE_KIND_TRUE;
 use crate::VALUE_KIND_USER_DEFINED;
+use crate::VALUE_KIND_CLASS;
 use indexmap::IndexSet;
 use std::io::Write;
 
@@ -295,6 +296,14 @@ where
                         self.write_byte_string(value.value())?;
                     }
                 }
+            }
+            Value::Class(value) => {
+                if self.try_write_value_object_link(handle)? {
+                    return Ok(());
+                }
+
+                self.write_byte(VALUE_KIND_CLASS)?;
+                self.write_byte_string(value.value())?;
             }
         }
 

@@ -12,6 +12,7 @@ use crate::Value;
 use crate::ValueArena;
 use crate::ValueHandle;
 use crate::ValueKind;
+use crate::value_arena::ClassValue;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -337,6 +338,15 @@ impl<'a> FromValue<'a> for &'a UserDefinedValue {
     fn from_value(ctx: &FromValueContext<'a>, value: &'a Value) -> Result<Self, FromValueError> {
         match value {
             Value::UserDefined(value) => Ok(value),
+            value => Err(ctx.new_unexpected_value_kind_error(value.kind())),
+        }
+    }
+}
+
+impl<'a> FromValue<'a> for &'a ClassValue {
+    fn from_value(ctx: &FromValueContext<'a>, value: &'a Value) -> Result<Self, FromValueError> {
+        match value {
+            Value::Class(value) => Ok(value),
             value => Err(ctx.new_unexpected_value_kind_error(value.kind())),
         }
     }

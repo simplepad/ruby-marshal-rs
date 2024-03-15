@@ -7,6 +7,7 @@ use crate::StringValue;
 use crate::SymbolValue;
 use crate::TypedValueHandle;
 use crate::UserDefinedValue;
+use crate::ClassValue;
 use crate::Value;
 use crate::ValueArena;
 use crate::ValueHandle;
@@ -26,6 +27,7 @@ use crate::VALUE_KIND_SYMBOL;
 use crate::VALUE_KIND_SYMBOL_LINK;
 use crate::VALUE_KIND_TRUE;
 use crate::VALUE_KIND_USER_DEFINED;
+use crate::VALUE_KIND_CLASS;
 use std::io::Read;
 
 #[derive(Debug)]
@@ -280,6 +282,16 @@ where
         Ok(handle)
     }
 
+    /// Read a class.
+    fn read_class(&mut self) -> Result<TypedValueHandle<ClassValue>, Error> {
+        let class = self.read_byte_string()?;
+        let handle = self.arena.create_class(class);
+
+        self.object_links.push(handle.into());
+
+        Ok(handle)
+    }
+
     /// Read the next value, failing if it is not a symbol-like value.
     fn read_value_symbol_like(&mut self) -> Result<TypedValueHandle<SymbolValue>, Error> {
         let kind = self.read_byte()?;
@@ -331,6 +343,7 @@ where
             VALUE_KIND_OBJECT => Ok(self.read_object()?.into()),
             VALUE_KIND_STRING => Ok(self.read_string()?.into()),
             VALUE_KIND_USER_DEFINED => Ok(self.read_user_defined()?.into()),
+            VALUE_KIND_CLASS => Ok(self.read_class()?.into()),
             _ => Err(Error::InvalidValueKind { kind }),
         }
     }

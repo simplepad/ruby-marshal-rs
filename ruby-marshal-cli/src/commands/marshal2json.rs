@@ -88,6 +88,9 @@ fn ruby2json_value(
         ruby_marshal::Value::UserDefined(_value) => {
             bail!("cannot convert an UserDefined to Json")
         }
+        ruby_marshal::Value::Class(_value) => {
+            bail!("cannot convert a Class to Json")
+        }
     }
 }
 

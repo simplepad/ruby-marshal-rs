@@ -30,6 +30,9 @@ pub enum Value {
 
     /// A User Defined Value
     UserDefined(UserDefinedValue),
+
+    /// A Class
+    Class(ClassValue),
 }
 
 impl Value {
@@ -69,6 +72,7 @@ impl Value {
             Self::Object(_) => ValueKind::Object,
             Self::String(_) => ValueKind::String,
             Self::UserDefined(_) => ValueKind::UserDefined,
+            Self::Class(_) => ValueKind::Class,
         }
     }
 }
@@ -124,6 +128,12 @@ impl From<StringValue> for Value {
 impl From<UserDefinedValue> for Value {
     fn from(value: UserDefinedValue) -> Self {
         Self::UserDefined(value)
+    }
+}
+
+impl From<ClassValue> for Value {
+    fn from(value: ClassValue) -> Self {
+        Self::Class(value)
     }
 }
 
@@ -358,6 +368,24 @@ impl UserDefinedValue {
     }
 }
 
+/// A Class
+#[derive(Debug)]
+pub struct ClassValue {
+    value: Vec<u8>,
+}
+
+impl ClassValue {
+    /// Create a new [`ClassValue`].
+    pub(super) fn new(value: Vec<u8>) -> Self {
+        Self { value }
+    }
+
+    /// Get the inner value.
+    pub fn value(&self) -> &[u8] {
+        &self.value
+    }
+}
+
 /// The kind of value
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 pub enum ValueKind {
@@ -370,4 +398,5 @@ pub enum ValueKind {
     Object,
     String,
     UserDefined,
+    Class,
 }

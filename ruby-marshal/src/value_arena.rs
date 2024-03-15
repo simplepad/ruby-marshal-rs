@@ -10,6 +10,7 @@ pub use self::value::ObjectValue;
 pub use self::value::StringValue;
 pub use self::value::SymbolValue;
 pub use self::value::UserDefinedValue;
+pub use self::value::ClassValue;
 pub use self::value::Value;
 pub use self::value::ValueKind;
 pub use self::value_handle::TypedValueHandle;
@@ -159,6 +160,14 @@ impl ValueArena {
         let index = self
             .arena
             .insert(Value::UserDefined(UserDefinedValue::new(name, value)));
+        let handle = ValueHandle::new(index);
+
+        TypedValueHandle::new_unchecked(handle)
+    }
+
+    /// Create an orphan `Class` value and return the handle.
+    pub fn create_class(&mut self, value: Vec<u8>) -> TypedValueHandle<ClassValue> {
+        let index = self.arena.insert(Value::Class(ClassValue::new(value)));
         let handle = ValueHandle::new(index);
 
         TypedValueHandle::new_unchecked(handle)

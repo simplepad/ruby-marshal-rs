@@ -21,6 +21,7 @@ pub use self::value_arena::StringValue;
 pub use self::value_arena::SymbolValue;
 pub use self::value_arena::TypedValueHandle;
 pub use self::value_arena::UserDefinedValue;
+pub use self::value_arena::ClassValue;
 pub use self::value_arena::Value;
 pub use self::value_arena::ValueArena;
 pub use self::value_arena::ValueHandle;
@@ -43,6 +44,7 @@ const VALUE_KIND_HASH_DEFAULT: u8 = b'}';
 const VALUE_KIND_OBJECT: u8 = b'o';
 const VALUE_KIND_STRING: u8 = b'"';
 const VALUE_KIND_USER_DEFINED: u8 = b'u';
+const VALUE_KIND_CLASS: u8 = b'c';
 
 /// The library error type
 #[derive(Debug)]
@@ -155,6 +157,7 @@ mod test {
             let data = std::fs::read(&entry_path).expect("failed to read entry");
             let mut data_reader = std::io::Cursor::new(&data);
 
+            println!("entry_path = {:?}", entry_path);
             let value_arena = load(&mut data_reader).expect("failed to load");
 
             let mut new_data = Vec::new();
