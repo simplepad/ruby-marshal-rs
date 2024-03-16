@@ -13,6 +13,9 @@ pub enum Value {
     /// A Fixnum
     Fixnum(FixnumValue),
 
+    /// A Float
+    Float(FloatValue),
+
     /// A Symbol
     Symbol(SymbolValue),
 
@@ -66,6 +69,7 @@ impl Value {
             Self::Nil(_) => ValueKind::Nil,
             Self::Bool(_) => ValueKind::Bool,
             Self::Fixnum(_) => ValueKind::Fixnum,
+            Self::Float(_) => ValueKind::Float,
             Self::Symbol(_) => ValueKind::Symbol,
             Self::Array(_) => ValueKind::Array,
             Self::Hash(_) => ValueKind::Hash,
@@ -92,6 +96,12 @@ impl From<BoolValue> for Value {
 impl From<FixnumValue> for Value {
     fn from(value: FixnumValue) -> Self {
         Self::Fixnum(value)
+    }
+}
+
+impl From<FloatValue> for Value {
+    fn from(value: FloatValue) -> Self {
+        Self::Float(value)
     }
 }
 
@@ -173,6 +183,24 @@ impl FixnumValue {
 
     /// Get the inner value
     pub fn value(self) -> i32 {
+        self.value
+    }
+}
+
+/// A Float Value
+#[derive(Debug, Copy, Clone)]
+pub struct FloatValue {
+    value: f64,
+}
+
+impl FloatValue {
+    /// Create a new [`FloatValue`].
+    pub(super) fn new(value: f64) -> Self {
+        Self { value }
+    }
+
+    /// Get the inner value
+    pub fn value(self) -> f64 {
         self.value
     }
 }
@@ -392,6 +420,7 @@ pub enum ValueKind {
     Nil,
     Bool,
     Fixnum,
+    Float,
     Symbol,
     Array,
     Hash,

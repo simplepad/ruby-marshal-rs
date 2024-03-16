@@ -2,17 +2,18 @@ use super::DisplayByteString;
 use crate::ArrayValue;
 use crate::BoolValue;
 use crate::FixnumValue;
+use crate::FloatValue;
 use crate::HashValue;
 use crate::NilValue;
 use crate::ObjectValue;
 use crate::StringValue;
 use crate::SymbolValue;
 use crate::UserDefinedValue;
+use crate::ClassValue;
 use crate::Value;
 use crate::ValueArena;
 use crate::ValueHandle;
 use crate::ValueKind;
-use crate::value_arena::ClassValue;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::hash::Hash;
@@ -289,6 +290,15 @@ impl<'a> FromValue<'a> for &'a FixnumValue {
     }
 }
 
+impl<'a> FromValue<'a> for &'a FloatValue {
+    fn from_value(ctx: &FromValueContext<'a>, value: &'a Value) -> Result<Self, FromValueError> {
+        match value {
+            Value::Float(value) => Ok(value),
+            value => Err(ctx.new_unexpected_value_kind_error(value.kind())),
+        }
+    }
+}
+
 impl<'a> FromValue<'a> for &'a SymbolValue {
     fn from_value(ctx: &FromValueContext<'a>, value: &'a Value) -> Result<Self, FromValueError> {
         match value {
@@ -362,6 +372,13 @@ impl<'a> FromValue<'a> for bool {
 impl<'a> FromValue<'a> for i32 {
     fn from_value(ctx: &FromValueContext<'a>, value: &'a Value) -> Result<Self, FromValueError> {
         let value: &FixnumValue = FromValue::from_value(ctx, value)?;
+        Ok(value.value())
+    }
+}
+
+impl<'a> FromValue<'a> for f64 {
+    fn from_value(ctx: &FromValueContext<'a>, value: &'a Value) -> Result<Self, FromValueError> {
+        let value: &FloatValue = FromValue::from_value(ctx, value)?;
         Ok(value.value())
     }
 }

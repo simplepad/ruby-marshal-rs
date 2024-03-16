@@ -1,6 +1,7 @@
 use crate::Error;
 use crate::SymbolValue;
 use crate::TypedValueHandle;
+use crate::VALUE_KIND_FLOAT;
 use crate::Value;
 use crate::ValueArena;
 use crate::ValueHandle;
@@ -114,6 +115,27 @@ where
         Ok(())
     }
 
+    /// Write a Float
+    fn write_float(&mut self, mut value: f64) -> Result<(), Error> {
+        if value.is_nan() {
+            self.write_byte_string("nan".as_bytes())?;
+            return Ok(())
+        }
+
+        if value.is_infinite() {
+            if value.is_sign_positive() {
+                self.write_byte_string("inf".as_bytes())?;
+            } else {
+                self.write_byte_string("-inf".as_bytes())?;
+            }
+            return Ok(())
+        }
+
+        self.write_byte_string(value.to_string().as_bytes())?;
+
+        Ok(())
+    }
+
     /// Try to write a value object reference, if possible.
     /// If not successful, this entry is recorded and will be used for future resolutions.
     ///
@@ -200,6 +222,10 @@ where
             Value::Fixnum(value) => {
                 self.write_byte(VALUE_KIND_FIXNUM)?;
                 self.write_fixnum(value.value())?;
+            }
+            Value::Float(value) => {
+                self.write_byte(VALUE_KIND_FLOAT)?;
+                self.write_float(value.value())?;
             }
             Value::Symbol(value) => {
                 let handle = TypedValueHandle::new_unchecked(handle);

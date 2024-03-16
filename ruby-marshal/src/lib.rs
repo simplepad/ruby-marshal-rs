@@ -14,6 +14,7 @@ pub use self::load::load;
 pub use self::value_arena::ArrayValue;
 pub use self::value_arena::BoolValue;
 pub use self::value_arena::FixnumValue;
+pub use self::value_arena::FloatValue;
 pub use self::value_arena::HashValue;
 pub use self::value_arena::NilValue;
 pub use self::value_arena::ObjectValue;
@@ -34,6 +35,7 @@ const VALUE_KIND_NIL: u8 = b'0';
 const VALUE_KIND_TRUE: u8 = b'T';
 const VALUE_KIND_FALSE: u8 = b'F';
 const VALUE_KIND_FIXNUM: u8 = b'i';
+const VALUE_KIND_FLOAT: u8 = b'f';
 const VALUE_KIND_SYMBOL: u8 = b':';
 const VALUE_KIND_SYMBOL_LINK: u8 = b';';
 const VALUE_KIND_OBJECT_LINK: u8 = b'@';
@@ -79,6 +81,12 @@ pub enum Error {
     /// The usize is not a valid Fixnum
     USizeInvalidFixnum { error: std::num::TryFromIntError },
 
+    /// Float string is cannot be decoded as utf-8
+    InvalidFloatUtf8 { error: std::str::Utf8Error },
+
+    /// Float cannot be parsed
+    InvalidFloat { error: <f64 as std::str::FromStr>::Err },
+
     /// Missing a symbol link
     MissingSymbolLink { index: usize },
 
@@ -108,6 +116,8 @@ impl std::fmt::Display for Error {
             Self::InvalidFixnumSize { size } => write!(f, "invalid fixnum size {size}"),
             Self::FixnumInvalidUSize { .. } => write!(f, "fixnum is not a valid usize"),
             Self::USizeInvalidFixnum { .. } => write!(f, "usize is not a valid Fixnum"),
+            Self::InvalidFloatUtf8 { .. } => write!(f, "float string is not valid utf-8"),
+            Self::InvalidFloat { .. } => write!(f, "float cannot be parsed"),
             Self::MissingSymbolLink { index } => write!(f, "missing symbol link {index}"),
             Self::MissingObjectLink { index } => write!(f, "missing object link {index}"),
             Self::UnexpectedValueKind { expected, actual } => write!(

@@ -1,6 +1,7 @@
 use crate::ArrayValue;
 use crate::Error;
 use crate::FixnumValue;
+use crate::FloatValue;
 use crate::HashValue;
 use crate::ObjectValue;
 use crate::StringValue;
@@ -16,6 +17,7 @@ use crate::MINOR_VERSION;
 use crate::VALUE_KIND_ARRAY;
 use crate::VALUE_KIND_FALSE;
 use crate::VALUE_KIND_FIXNUM;
+use crate::VALUE_KIND_FLOAT;
 use crate::VALUE_KIND_HASH;
 use crate::VALUE_KIND_HASH_DEFAULT;
 use crate::VALUE_KIND_INSTANCE_VARIABLES;
@@ -142,6 +144,36 @@ where
     fn read_fixnum(&mut self) -> Result<TypedValueHandle<FixnumValue>, Error> {
         let value = self.read_fixnum_value()?;
         Ok(self.arena.create_fixnum(value))
+    }
+
+    /// Read a float value
+    fn read_float_value(&mut self) -> Result<f64, Error> {
+        let float = self.read_byte_string()?;
+
+        match float.as_slice() {
+            b"nan" => {
+                Ok(f64::NAN)
+            },
+            b"inf" => {
+                Ok(f64::INFINITY)
+            },
+            b"-inf" => {
+                Ok(f64::NEG_INFINITY)
+            },
+            _ => {
+                Ok(std::str::from_utf8(&float)
+                    .map_err(|error| Error::InvalidFloatUtf8 { error })?
+                    .parse::<f64>()
+                    .map_err(|error| Error::InvalidFloat { error })?
+                )
+            }
+        }
+    }
+
+    /// Read a float.
+    fn read_float(&mut self) -> Result<TypedValueHandle<FloatValue>, Error> {
+        let value = self.read_float_value()?;
+        Ok(self.arena.create_float(value))
     }
 
     /// Read a symbol.
@@ -313,6 +345,7 @@ where
             VALUE_KIND_TRUE => Ok(self.arena.create_bool(true).into()),
             VALUE_KIND_FALSE => Ok(self.arena.create_bool(false).into()),
             VALUE_KIND_FIXNUM => Ok(self.read_fixnum()?.into()),
+            VALUE_KIND_FLOAT => Ok(self.read_float()?.into()),
             VALUE_KIND_SYMBOL => Ok(self.read_symbol()?.into()),
             VALUE_KIND_SYMBOL_LINK => Ok(self.read_symbol_link()?.into()),
             VALUE_KIND_OBJECT_LINK => Ok(self.read_object_link()?),

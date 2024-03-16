@@ -77,6 +77,12 @@ impl IntoValue for i32 {
     }
 }
 
+impl IntoValue for f64 {
+    fn into_value(self, arena: &mut ValueArena) -> Result<ValueHandle, IntoValueError> {
+        Ok(arena.create_float(self).into())
+    }
+}
+
 impl<T> IntoValue for Vec<T>
 where
     T: IntoValue,
@@ -115,12 +121,14 @@ mod test {
     use crate::ArrayValue;
     use crate::BoolValue;
     use crate::FixnumValue;
+    use crate::FloatValue;
     use crate::HashValue;
     use crate::NilValue;
     use crate::ObjectValue;
     use crate::StringValue;
     use crate::SymbolValue;
     use crate::UserDefinedValue;
+    use crate::ClassValue;
     use crate::Value;
 
     #[test]
@@ -130,6 +138,7 @@ mod test {
         let nil_handle = arena.create_nil().into_raw();
         let bool_handle = arena.create_bool(true).into_raw();
         let fixnum_handle = arena.create_fixnum(23).into_raw();
+        let float_handle = arena.create_float(3.14).into_raw();
         let symbol_handle = arena.create_symbol("symbol".into());
         let array_handle = arena.create_array(vec![fixnum_handle]).into_raw();
         let hash_handle = arena.create_hash(Vec::new(), None).into_raw();
@@ -138,6 +147,7 @@ mod test {
         let user_defined_handle = arena
             .create_user_defined(symbol_handle, Vec::new())
             .into_raw();
+        let class_handle = arena.create_class("MyClass".into()).into_raw();
 
         let symbol_handle = symbol_handle.into_raw();
 
@@ -158,6 +168,10 @@ mod test {
         let _fixnum_value: &FixnumValue = ctx
             .from_value(fixnum_handle)
             .expect("failed exec &FixnumValue::from_value");
+
+        let _float_value: &FloatValue = ctx
+            .from_value(float_handle)
+            .expect("failed exec &FloatValue::from_value");
 
         let _symbol_value: &SymbolValue = ctx
             .from_value(symbol_handle)
@@ -183,6 +197,10 @@ mod test {
             .from_value(user_defined_handle)
             .expect("failed exec &UserDefinedValue::from_value");
 
+        let _class_value: &ClassValue = ctx
+            .from_value(class_handle)
+            .expect("failed exec &ClassValue::from_value");
+
         let _bool_value: bool = ctx
             .from_value(bool_handle)
             .expect("failed exec bool::from_value");
@@ -190,6 +208,10 @@ mod test {
         let _i32_value: i32 = ctx
             .from_value(fixnum_handle)
             .expect("failed exec i32::from_value");
+
+        let _f64_value: f64 = ctx
+            .from_value(float_handle)
+            .expect("failed exec f64::from_value");
 
         let _some_symbol_value: Option<&SymbolValue> = ctx
             .from_value(symbol_handle)
