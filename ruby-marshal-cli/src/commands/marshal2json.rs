@@ -2,6 +2,7 @@ use anyhow::bail;
 use anyhow::ensure;
 use anyhow::Context;
 use base64::Engine;
+use serde_json::json;
 use std::path::PathBuf;
 
 #[derive(Debug, argh::FromArgs)]
@@ -40,6 +41,7 @@ fn ruby2json_value(
         ruby_marshal::Value::Bool(value) => Ok(serde_json::Value::Bool(value.value())),
         ruby_marshal::Value::Symbol(_value) => bail!("cannot convert a Symbol to Json"),
         ruby_marshal::Value::Fixnum(value) => Ok(serde_json::Value::Number(value.value().into())),
+        ruby_marshal::Value::Float(value) => Ok(json!(value.value())),
         ruby_marshal::Value::Array(value) => {
             let value = value.value();
 
