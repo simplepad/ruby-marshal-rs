@@ -333,7 +333,7 @@ where
                 }
 
                 self.write_byte(VALUE_KIND_CLASS)?;
-                self.write_byte_string(value.value())?;
+                self.write_byte_string(value.name())?;
             }
         }
 

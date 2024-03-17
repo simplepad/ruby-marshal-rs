@@ -399,18 +399,18 @@ impl UserDefinedValue {
 /// A Class
 #[derive(Debug)]
 pub struct ClassValue {
-    value: Vec<u8>,
+    name: Vec<u8>,
 }
 
 impl ClassValue {
     /// Create a new [`ClassValue`].
-    pub(super) fn new(value: Vec<u8>) -> Self {
-        Self { value }
+    pub(super) fn new(name: Vec<u8>) -> Self {
+        Self { name }
     }
 
-    /// Get the inner value.
-    pub fn value(&self) -> &[u8] {
-        &self.value
+    /// Get the name.
+    pub fn name(&self) -> &[u8] {
+        &self.name
     }
 }
 

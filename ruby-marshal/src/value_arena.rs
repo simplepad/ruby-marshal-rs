@@ -175,8 +175,8 @@ impl ValueArena {
     }
 
     /// Create an orphan `Class` value and return the handle.
-    pub fn create_class(&mut self, value: Vec<u8>) -> TypedValueHandle<ClassValue> {
-        let index = self.arena.insert(Value::Class(ClassValue::new(value)));
+    pub fn create_class(&mut self, name: Vec<u8>) -> TypedValueHandle<ClassValue> {
+        let index = self.arena.insert(Value::Class(ClassValue::new(name)));
         let handle = ValueHandle::new(index);
 
         TypedValueHandle::new_unchecked(handle)
