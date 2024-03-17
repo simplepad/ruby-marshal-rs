@@ -138,7 +138,7 @@ mod test {
         let nil_handle = arena.create_nil().into_raw();
         let bool_handle = arena.create_bool(true).into_raw();
         let fixnum_handle = arena.create_fixnum(23).into_raw();
-        let float_handle = arena.create_float(3.14).into_raw();
+        let float_handle = arena.create_float(2.5).into_raw();
         let symbol_handle = arena.create_symbol("symbol".into());
         let array_handle = arena.create_array(vec![fixnum_handle]).into_raw();
         let hash_handle = arena.create_hash(Vec::new(), None).into_raw();

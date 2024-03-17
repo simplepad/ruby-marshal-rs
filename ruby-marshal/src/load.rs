@@ -173,7 +173,11 @@ where
     /// Read a float.
     fn read_float(&mut self) -> Result<TypedValueHandle<FloatValue>, Error> {
         let value = self.read_float_value()?;
-        Ok(self.arena.create_float(value))
+        let handle = self.arena.create_float(value);
+
+        self.object_links.push(handle.into());
+
+        Ok(handle)
     }
 
     /// Read a symbol.

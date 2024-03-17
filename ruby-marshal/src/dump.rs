@@ -224,6 +224,10 @@ where
                 self.write_fixnum(value.value())?;
             }
             Value::Float(value) => {
+                if self.try_write_value_object_link(handle)? {
+                    return Ok(());
+                }
+
                 self.write_byte(VALUE_KIND_FLOAT)?;
                 self.write_float(value.value())?;
             }
